@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/lib/supabaseClient";
+import { isSupabaseConfigured, supabase } from "@/lib/supabaseClient";
 import StatusBanner from "@/app/components/StatusBanner";
 
 export default function ForgotPage() {
@@ -47,6 +47,10 @@ export default function ForgotPage() {
               onClick={async () => {
                 setError(null);
                 setMessage(null);
+                if (!isSupabaseConfigured) {
+                  setError("未配置 Supabase 环境变量");
+                  return;
+                }
                 if (!email) {
                   alert("请先输入邮箱");
                   return;

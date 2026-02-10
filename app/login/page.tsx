@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { isSupabaseConfigured, supabase } from "@/lib/supabaseClient";
 import StatusBanner from "@/app/components/StatusBanner";
 
 export default function LoginPage() {
@@ -17,6 +17,10 @@ export default function LoginPage() {
 
   useEffect(() => {
     const check = async () => {
+      if (!isSupabaseConfigured) {
+        setError("未配置 Supabase 环境变量");
+        return;
+      }
       const { data } = await supabase.auth.getUser();
       if (data.user) {
         router.replace("/dashboard");
@@ -74,6 +78,10 @@ export default function LoginPage() {
               className="w-full"
               onClick={async () => {
                 setError(null);
+                if (!isSupabaseConfigured) {
+                  setError("未配置 Supabase 环境变量");
+                  return;
+                }
                 if (!email) {
                   alert("请先输入邮箱");
                   return;

@@ -7,7 +7,7 @@ import TaskItem from "./components/TaskItem";
 import CalendarView from "./components/CalendarView";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/lib/supabaseClient";
+import { isSupabaseConfigured, supabase } from "@/lib/supabaseClient";
 import StatusBanner from "@/app/components/StatusBanner";
 
 const features = [
@@ -47,6 +47,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const load = async () => {
+      if (!isSupabaseConfigured) {
+        setError("未配置 Supabase 环境变量");
+        return;
+      }
       setLoading(true);
       setError(null);
       const { data: userData, error: userError } = await supabase.auth.getUser();
