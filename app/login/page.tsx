@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { isSupabaseConfigured, supabase } from "@/lib/supabaseClient";
+import { getSupabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 import StatusBanner from "@/app/components/StatusBanner";
 
 export default function LoginPage() {
@@ -21,6 +21,8 @@ export default function LoginPage() {
         setError("未配置 Supabase 环境变量");
         return;
       }
+      const supabase = getSupabase();
+      if (!supabase) return;
       const { data } = await supabase.auth.getUser();
       if (data.user) {
         router.replace("/dashboard");
@@ -79,6 +81,11 @@ export default function LoginPage() {
               onClick={async () => {
                 setError(null);
                 if (!isSupabaseConfigured) {
+                  setError("未配置 Supabase 环境变量");
+                  return;
+                }
+                const supabase = getSupabase();
+                if (!supabase) {
                   setError("未配置 Supabase 环境变量");
                   return;
                 }

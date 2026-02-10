@@ -7,8 +7,8 @@ import TaskItem from "./components/TaskItem";
 import CalendarView from "./components/CalendarView";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { isSupabaseConfigured, supabase } from "@/lib/supabaseClient";
 import StatusBanner from "@/app/components/StatusBanner";
+import { getSupabase, isSupabaseConfigured } from "@/lib/supabaseClient";
 
 const features = [
   { title: "任务管理", desc: "创建、查看、完成任务。" },
@@ -51,6 +51,11 @@ export default function DashboardPage() {
         setError("未配置 Supabase 环境变量");
         return;
       }
+      const supabase = getSupabase();
+      if (!supabase) {
+        setError("未配置 Supabase 环境变量");
+        return;
+      }
       setLoading(true);
       setError(null);
       const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -81,7 +86,7 @@ export default function DashboardPage() {
     };
 
     load();
-  }, []);
+  }, [router]);
 
   return (
     <main className="min-h-screen bg-zinc-50 px-4 py-12 text-zinc-900 sm:px-6 sm:py-16">
@@ -93,6 +98,11 @@ export default function DashboardPage() {
           <Button
             variant="outline"
             onClick={async () => {
+              const supabase = getSupabase();
+              if (!supabase) {
+                setError("未配置 Supabase 环境变量");
+                return;
+              }
               await supabase.auth.signOut();
               router.push("/login");
             }}
@@ -144,6 +154,11 @@ export default function DashboardPage() {
                   setError("请先登录");
                   return;
                 }
+                const supabase = getSupabase();
+                if (!supabase) {
+                  setError("未配置 Supabase 环境变量");
+                  return;
+                }
                 setLoading(true);
                 const { data, error: insertError } = await supabase
                   .from("tasks")
@@ -182,7 +197,7 @@ export default function DashboardPage() {
             <p className="mt-3 text-sm text-zinc-500">暂无任务，先添加一个吧。</p>
           ) : null}
           <ul className="mt-4 space-y-2 text-zinc-700">
-            {visibleTasks.map((task) => (
+            {visibleTasks.map((task) =>
               editingId === task.id ? (
                 <li
                   key={task.id}
@@ -196,6 +211,11 @@ export default function DashboardPage() {
                   <Button
                     onClick={async () => {
                       if (!editingText.trim()) return;
+                      const supabase = getSupabase();
+                      if (!supabase) {
+                        setError("未配置 Supabase 环境变量");
+                        return;
+                      }
                       setLoading(true);
                       const { error: updateError } = await supabase
                         .from("tasks")
@@ -238,6 +258,11 @@ export default function DashboardPage() {
                     const current = tasks.find((t) => t.id === id);
                     if (!current) return;
                     const nextDone = !current.done;
+                    const supabase = getSupabase();
+                    if (!supabase) {
+                      setError("未配置 Supabase 环境变量");
+                      return;
+                    }
                     setLoading(true);
                     const { error: updateError } = await supabase
                       .from("tasks")
@@ -259,6 +284,11 @@ export default function DashboardPage() {
                     setEditingText(currentTask.text);
                   }}
                   onDelete={async (id) => {
+                    const supabase = getSupabase();
+                    if (!supabase) {
+                      setError("未配置 Supabase 环境变量");
+                      return;
+                    }
                     setLoading(true);
                     const { error: deleteError } = await supabase
                       .from("tasks")
@@ -273,7 +303,7 @@ export default function DashboardPage() {
                   }}
                 />
               )
-            ))}
+            )}
           </ul>
         </section>
       </div>
