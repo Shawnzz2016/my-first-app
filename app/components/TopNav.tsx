@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { getSupabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 
 export default function TopNav() {
@@ -12,6 +12,11 @@ export default function TopNav() {
 
   useEffect(() => {
     const load = async () => {
+      const supabase = getSupabase();
+      if (!supabase) {
+        setEmail(null);
+        return;
+      }
       const { data } = await supabase.auth.getUser();
       setEmail(data.user?.email ?? null);
     };
@@ -35,6 +40,8 @@ export default function TopNav() {
                 variant="outline"
                 size="sm"
                 onClick={async () => {
+                  const supabase = getSupabase();
+                  if (!supabase) return;
                   await supabase.auth.signOut();
                   setEmail(null);
                   router.push("/login");
